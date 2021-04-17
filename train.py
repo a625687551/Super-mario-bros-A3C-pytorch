@@ -3,6 +3,7 @@
 """
 
 import os
+
 os.environ['OMP_NUM_THREADS'] = '1'
 import argparse
 import torch
@@ -13,6 +14,8 @@ from src.process import local_train, local_test
 import torch.multiprocessing as _mp
 import shutil
 
+# torch.cuda.current_device()
+# torch.cuda._initialized = True
 
 def get_args():
     parser = argparse.ArgumentParser(
@@ -63,6 +66,10 @@ def train(opt):
             global_model.load_state_dict(torch.load(file_))
 
     optimizer = GlobalAdam(global_model.parameters(), lr=opt.lr)
+    # windonws 不支持多线程
+    # local_train(0, opt, global_model, optimizer, True)
+    # local_test(opt.num_processes, opt, global_model)
+    # 其他的平台
     processes = []
     for index in range(opt.num_processes):
         if index == 0:
